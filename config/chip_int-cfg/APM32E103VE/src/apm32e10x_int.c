@@ -122,9 +122,11 @@ void UsageFault_Handler(void)
  * @retval  None
  *
  */
+#ifdef EASY_OS
 void SVC_Handler(void)
 {
 }
+#endif
 
 /*!
  * @brief   This function handles Debug Monitor exception
@@ -146,15 +148,18 @@ void DebugMon_Handler(void)
  * @retval  None
  *
  */
+#ifdef EASY_OS
 void PendSV_Handler(void)
 {
 }
+#endif
 
+#ifdef EASY_OS
 void SysTick_Handler(void)
 {
   GtmTom2Ch0Notify_Cbk(0,0,0,0);
 }
-
+#endif
 /**@} end of group GPIO_Toggle_INT_Functions */
 /**@} end of group GPIO_Toggle */
 /**@} end of group Examples */

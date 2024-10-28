@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>APM32E103_MIN,EASY_OS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\inc;..\..\os\easyos\OS_Driver;..\..\os\easyos\OS_Task;..\..\types;..\..\lib\chip_libraries\APM32E103VE\drivers\inc;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\core_support;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\device_support;..\..\config\chip_int-cfg\APM32E103VE\inc</IncludePath>
+              <IncludePath>..\inc;..\..\os\easyos\OS_Driver;..\..\os\easyos\OS_Task;..\..\types;..\..\lib\chip_libraries\APM32E103VE\drivers\inc;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\core_support;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\device_support;..\..\config\chip_int-cfg\APM32E103VE\inc;..\..\config\os-cfg\easyos-cfg\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -390,6 +390,11 @@
               <FileName>apm32e10x_int.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\config\chip_int-cfg\APM32E103VE\src\apm32e10x_int.c</FilePath>
+            </File>
+            <File>
+              <FileName>easyos_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\os-cfg\easyos-cfg\src\easyos_cfg.c</FilePath>
             </File>
           </Files>
         </Group>
