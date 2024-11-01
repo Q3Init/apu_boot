@@ -8,7 +8,7 @@
 #include "freeRTOS_task.h"
 #endif
 #ifdef BOOT_ENABLE
-#include "BSW_BootSelect.h"
+#include "bootcheck.h"
 #endif
 
 int main(void)
@@ -16,7 +16,7 @@ int main(void)
 #ifdef EASY_OS
 	uint8 Priority;
 #ifdef BOOT_ENABLE
-	(void)Bsw_BootSelectInit();
+	(void)BootSelectInit();
 #else
 	(void)rte_init();
 #endif

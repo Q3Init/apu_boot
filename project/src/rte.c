@@ -9,6 +9,9 @@
 #ifdef CONFIG_GPIO
 #include "gpio.h"
 #endif
+#include "uartif.h"
+#include "intertp.h"
+#include "iap.h"
 /* user file*/
 #include "apm32e10x.h"
 
@@ -26,6 +29,9 @@ void rte_init(void)
 #if CONFIG_GPIO
     gpio_init();
 #endif
+    UartIf_Init();
+    InterTp_Init();
+    Iap_Init();   
 
     rteBswRdyFlg = TRUE; /* Init complete flag */
     __ENABLE_IRQ(); /* chip enable irq */
