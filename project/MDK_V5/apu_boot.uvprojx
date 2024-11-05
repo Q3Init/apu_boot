@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>APM32E103_MIN,EASY_OS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\inc;..\..\os\easyos\OS_Driver;..\..\os\easyos\OS_Task;..\..\types;..\..\lib\chip_libraries\APM32E103VE\drivers\inc;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\core_support;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\device_support;..\..\config\chip_int-cfg\APM32E103VE\inc;..\..\config\os-cfg\easyos-cfg\inc</IncludePath>
+              <IncludePath>..\inc;..\..\os\easyos\OS_Driver;..\..\os\easyos\OS_Task;..\..\types;..\..\lib\chip_libraries\APM32E103VE\drivers\inc;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\core_support;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\device_support;..\..\config\chip_int-cfg\APM32E103VE\inc;..\..\config\os-cfg\easyos-cfg\inc;..\..\platform\bootcheck\inc;..\..\platform\iap\inc;..\..\platform\intertp\inc;..\..\platform\pdur\inc;..\..\platform\uartif\inc;..\..\config\platform-cfg\bootcheck\inc;..\..\config\platform-cfg\iap\inc;..\..\config\platform-cfg\intertp\inc;..\..\config\platform-cfg\pdur\inc;..\..\config\platform-cfg\uartif\inc;..\..\drivers\crc\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -396,10 +396,42 @@
               <FileType>1</FileType>
               <FilePath>..\..\config\os-cfg\easyos-cfg\src\easyos_cfg.c</FilePath>
             </File>
+            <File>
+              <FileName>bootcheck_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\platform-cfg\bootcheck\src\bootcheck_cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>iap_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\platform-cfg\iap\src\iap_cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>intertp_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\platform-cfg\intertp\src\intertp_cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>pdur_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\platform-cfg\pdur\src\pdur_cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>uartif_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\platform-cfg\uartif\src\uartif_cfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>drivers</GroupName>
+          <Files>
+            <File>
+              <FileName>crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\crc\src\crc.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>ext-driver</GroupName>
@@ -581,6 +613,33 @@
         </Group>
         <Group>
           <GroupName>platform</GroupName>
+          <Files>
+            <File>
+              <FileName>bootcheck.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\platform\bootcheck\src\bootcheck.c</FilePath>
+            </File>
+            <File>
+              <FileName>iap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\platform\iap\src\iap.c</FilePath>
+            </File>
+            <File>
+              <FileName>intertp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\platform\intertp\src\intertp.c</FilePath>
+            </File>
+            <File>
+              <FileName>pdur.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\platform\pdur\src\pdur.c</FilePath>
+            </File>
+            <File>
+              <FileName>uartif.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\platform\uartif\src\uartif.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>project</GroupName>
