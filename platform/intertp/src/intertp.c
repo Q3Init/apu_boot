@@ -14,10 +14,10 @@
 #define INTER_TP_MSG_BYTE_CNT 16
 #define INTER_TP_HEADER_CNT   1
 #define INTER_TP_ID_CNT       1
-#define INTER_TP_CMD_CNT      1
 #define INTER_TP_DLC_CNT      2
 #define INTER_TP_XOR_CNT      2
 #define INTER_TP_HEADER       0xEE
+#define INTER_TP_RX_SIZE      512
 /*******************************************************************************
 **                      Private Type Definitions                              **
 *******************************************************************************/
@@ -31,7 +31,6 @@ typedef enum
 {
     INTER_TP_WAIT_HEADER = 0,
     INTER_TP_WAIT_ID,
-    INTER_TP_WAIT_CMD,
     INTER_TP_WAIT_DLC,
     INTER_TP_WAIT_DATA,
     INTER_TP_WAIT_XOR,
@@ -119,7 +118,7 @@ void InterTp_UartTxConfirmation( void )
  *
  * @brief  interTp transmit uartif confirmation
  */
-boolean InterTp_Transmit( uint16 pduId, const uint8* datas, uint8 cmd, uint16 len )
+boolean InterTp_Transmit( uint16 pduId, const uint8* datas, uint16 len )
 {
     boolean ret = FALSE;
     uint16  crc = 0;
@@ -129,13 +128,12 @@ boolean InterTp_Transmit( uint16 pduId, const uint8* datas, uint8 cmd, uint16 le
         {
             interTpTransmitMsgBuf[ 0 ] = INTER_TP_HEADER;
             interTpTransmitMsgBuf[ 1 ] = interTpPdusCfgTable[ pduId ].id;
-            interTpTransmitMsgBuf[ 2 ] = cmd;
-            interTpTransmitMsgBuf[ 3 ] = (uint8)( len >> 8 );
-            interTpTransmitMsgBuf[ 4 ] = (uint8)( len );
-            memcpy( &interTpTransmitMsgBuf[ 5 ], datas, len );
-            crc                              = InterTp_CalXor( &interTpTransmitMsgBuf[ 0 ], len + 5 );
-            interTpTransmitMsgBuf[ len + 5 ] = (uint8)( crc >> 8 );
-            interTpTransmitMsgBuf[ len + 6 ] = (uint8)( crc );
+            interTpTransmitMsgBuf[ 2 ] = (uint8)( len >> 8 );
+            interTpTransmitMsgBuf[ 3 ] = (uint8)( len );
+            memcpy( &interTpTransmitMsgBuf[ 4 ], datas, len );
+            crc                              = InterTp_CalXor( &interTpTransmitMsgBuf[ 0 ], len + 4 );
+            interTpTransmitMsgBuf[ len + 4 ] = (uint8)( crc >> 8 );
+            interTpTransmitMsgBuf[ len + 5 ] = (uint8)( crc );
             if ( interTpPdusCfgTable[ pduId ].dest == INTERTP_UART )
             {
                 ret = InterTp_UartTransmit( interTpTransmitMsgBuf, len + 7, interTpPdusCfgTable[ pduId ].bus );
@@ -170,7 +168,7 @@ static void InterTp_lRxIndication( uint8 srcModule, const uint8* datas, uint16 l
     uint16                 i;
     uint8                  data;
     uint16                 pduId;
-    uint8                  rxDatas[ 512 ];
+    uint8                  rxDatas[ INTER_TP_RX_SIZE ];
     PduInfoType            pdu;
     pdu.datas = rxDatas;
     if ( srcModule >= INTER_MODULES_CNT )
@@ -203,15 +201,6 @@ static void InterTp_lRxIndication( uint8 srcModule, const uint8* datas, uint16 l
                 objPtr->msg.id.buf[ objPtr->fieldBytesCnt ] = data;
                 objPtr->fieldBytesCnt++;
                 if ( objPtr->fieldBytesCnt == INTER_TP_ID_CNT )
-                {
-                    objPtr->fieldBytesCnt = 0;
-                    objPtr->step          = INTER_TP_WAIT_CMD;
-                }
-                break;
-            case INTER_TP_WAIT_CMD:
-                objPtr->msg.cmd.buf[ objPtr->fieldBytesCnt ] = data;
-                objPtr->fieldBytesCnt++;
-                if ( objPtr->fieldBytesCnt == INTER_TP_CMD_CNT )
                 {
                     objPtr->fieldBytesCnt = 0;
                     objPtr->step          = INTER_TP_WAIT_DLC;
@@ -248,7 +237,6 @@ static void InterTp_lRxIndication( uint8 srcModule, const uint8* datas, uint16 l
                             if ( interTpPdusCfgTable[ pduId ].id == ( objPtr->msg.id.val ) )
                             {
                                 pdu.id = objPtr->msg.id.val;
-                                pdu.cmd = objPtr->msg.cmd.val;
                                 pdu.len = objPtr->msg.dlc.val;
                                 (void)memcpy( pdu.datas, objPtr->msg.datas, pdu.len );
                                 if ( interTpPdusCfgTable[ pduId ].dest == INTERTP_PDUR )

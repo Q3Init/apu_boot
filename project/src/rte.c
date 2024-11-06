@@ -42,3 +42,9 @@ boolean Get_rteBswRdyFlg(void)
 {
 	return(rteBswRdyFlg);
 }
+
+void Rte_McuPerformReset(void)
+{
+    __DISENBLE_IRQ();
+    NVIC_SystemReset();
+}

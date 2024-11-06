@@ -8,5 +8,6 @@
 
 extern void rte_init(void);
 extern boolean Get_rteBswRdyFlg(void);
+extern void Rte_McuPerformReset(void);
 
 #endif

@@ -55,7 +55,7 @@ typedef struct {
 extern void InterTp_Init( void );
 extern void InterTp_UartRxIndication(uint8 uartIndex,const uint8 *datas, uint16 len);
 extern void InterTp_UartTxConfirmation( void );
-extern boolean InterTp_Transmit( uint16 pduId, const uint8* datas, uint8 cmd, uint16 len );
+extern boolean InterTp_Transmit( uint16 pduId, const uint8* datas, uint16 len );
 /*******************************************************************************
 **                      Global Inline Function Definitions                    **
 *******************************************************************************/

@@ -45,7 +45,7 @@ void PduR_Transmit(uint16 pduId, const PduInfoType *pduInfoPtr)
         if (PduRCfgTable[pduId].dest == PDUR_INTERTP) {
             if (Iap_ProvideTxBuffer(pduInfoPtr->len,&pdur_txpdu) == E_OK) {
                 (void)memcpy(pdur_txpdu,pduInfoPtr,sizeof(PduInfoType));
-                InterTp_Transmit(PduRCfgTable[pduId].pduId,pdur_txpdu->datas,pdur_txpdu->cmd,pdur_txpdu->len);
+                InterTp_Transmit(PduRCfgTable[pduId].pduId,pdur_txpdu->datas,pdur_txpdu->len);
             }
         } else {
             /* nothing to do */

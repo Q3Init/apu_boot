@@ -6,6 +6,7 @@
 #include "iap_cfg.h"
 #include <string.h>
 #include "pdur.h"
+#include "rte.h"
 /*******************************************************************************
 **                      Imported Compiler Switch Check                        **
 *******************************************************************************/
@@ -14,10 +15,14 @@
 **                      Private Macro Definitions                             **
 *******************************************************************************/
 #define IAP_MSG_BYTE_CNT 16
-#define IAP_RX_BUF_SIAZE 256
-#define IAP_TX_BUF_SIAZE 256
-#define IAP_ACK          0x55
-#define IAP_NACK         0xAA
+#define IAP_RX_BUF_SIAZE 512
+#define IAP_TX_BUF_SIAZE 512
+#define SESSION_TIMER_CNT 5000
+#define IAP_ACK                      0x55
+#define IAP_SESSION_MISMATCH         0x01
+#define IAP_DEPENDING                0x78
+
+#define IAP_SET_TIMER(time) ((((time) + 5 / 2) / 5) + 1)
 /*******************************************************************************
 **                   Function like macro definitions                          **
 *******************************************************************************/
@@ -46,6 +51,12 @@ typedef enum {
     Iap_BUFFER_FULL
 } IapBufStateType;
 
+typedef enum {
+    Defalut_session = 1,
+    Programming_session,
+    Extern_session,
+} SessionType;
+
 typedef struct
 {
     PduInfoType *rxPdu;
@@ -53,16 +64,23 @@ typedef struct
     uint16 rxPduLen;
     uint16 txPduLen;  
     IapBufStateType rxBufState;
-    IapBufStateType txBufState;          
+    IapBufStateType txBufState;
+    uint8 sessionLv;   
+    uint16 sessionTick;   
+
+    uint8 txCfirmReset;
+    uint16 resetPerformTick;    
 }IapRteType;
 
+#define RXLEN iapRte.rxPduLen
+#define TXLEN iapRte.txPduLen
 /*******************************************************************************
 **                      Private Function Declarations                         **
 *******************************************************************************/
-static void Iap_DefSession(void);
-static void Iap_ProSession(void);
-static void Iap_ExtSession(void);
-static void Iap_StopCommun(void);
+static void Iap_DefaultSession_Service(void);
+static void Iap_ProgrammingSession_Service(void);
+static void Iap_ExternSession_Service(void);
+static void Iap_StopCommunication_Service(void);
 static void Iap_Erase(void);
 static void Iap_Downloadn(void);
 static void Iap_Transing(void);
@@ -70,7 +88,11 @@ static void Iap_TransExit(void);
 static void Iap_CheckApp(void);
 static void Iap_SoftReset(void);
 static void Iap_KeepSession(void);
-static void Iap_Transmit(uint8 ack);
+static void Iap_PositiveResponse(void);
+static void Iap_NegativeResponse(uint8 ack);
+static void Iap_lAppendTx(uint8 data);
+static void Iap_lHandleReset(void);
+static void Iap_lHandleServ(void);
 /*******************************************************************************
 **                      Global Constant Definitions                           **
 *******************************************************************************/
@@ -114,9 +136,17 @@ void Iap_Init(void)
 
     iapRte.rxPdu = &iapRxPduInfo;
     iapRte.rxPdu->datas = iapRxBuf;
+    RXLEN = 0;
 
     iapRte.txPdu = &iapTxPduInfo;
     iapRte.txPdu->datas = iapTxBuf;
+    TXLEN = 0;
+
+    iapRte.sessionLv = Defalut_session;
+    iapRte.sessionTick = 0;
+
+    iapRte.txCfirmReset = FALSE;
+    iapRte.resetPerformTick = 0;
 }
 
 /**
@@ -128,45 +158,13 @@ void Iap_Init(void)
  */
 void Iap_MainFunction(void)
 {
-    if ( iapRte.rxBufState == Iap_BUFFER_FULL && iapRte.txBufState == Iap_BUFFER_IDLE) {
-        switch ( iapRte.rxPdu->cmd ) {
-            case IAP_CMD_DEF_SESSION:
-                Iap_DefSession();
-                break;
-            case IAP_CMD_PRO_SESSION:
-                Iap_ProSession();
-                break;
-            case IAP_CMD_EXT_SESSION:
-                Iap_ExtSession();
-                break;
-            case IAP_CMD_STOP_COMMUN:
-                Iap_StopCommun();
-                break;
-            case IAP_CMD_ERASE:
-                Iap_Erase();
-                break;
-            case IAP_CMD_DOWNLOAD:
-                Iap_Downloadn();
-                break;
-            case IAP_CMD_TRANSING:
-                Iap_Transing();
-                break;
-            case IAP_CMD_TRANS_EXIT:
-                Iap_TransExit();
-                break;
-            case IAP_CMD_CHECK_APP:
-                Iap_CheckApp();
-                break;
-            case IAP_CMD_SOFT_RESET:
-                Iap_SoftReset();
-                break;
-            case IAP_CMD_KEEP_SESSION:
-                Iap_KeepSession();
-                break;
-            default:
-                break;
-        }
+    if ( iapRte.sessionTick > 0) {
+        iapRte.sessionTick--;
+    } else {
+        iapRte.sessionLv = Defalut_session;
     }
+    Iap_lHandleServ();
+    Iap_lHandleReset();
 }
 
 /**
@@ -189,7 +187,7 @@ uint8 Iap_ProvideRxBuffer(uint16 len,PduInfoType **pdu)
             ret = E_NOK;
     } else {
         *pdu = iapRte.rxPdu;
-        iapRte.rxPduLen = len;
+        RXLEN = len;
         iapRte.rxBufState = Iap_BUFFER_PROVIDED;
     }
     return ret;
@@ -242,56 +240,203 @@ void Iap_RxIndication(uint8 rslt)
 void Iap_TxConfirmation(void)
 {
     iapRte.txBufState = Iap_BUFFER_IDLE;
+    if (iapRte.txCfirmReset == TRUE) {
+        iapRte.txCfirmReset = FALSE;
+        /* delay 50ms and perform reset */
+        iapRte.resetPerformTick = IAP_SET_TIMER(50);
+    }
 }
 
 /*******************************************************************************
 **                      Private Function Definitions                         **
 *******************************************************************************/
+/**
+* Iap_lHandleServ
+*
+* @return none
+*
+* @brief  Iap service handler function
+*/
+static void Iap_lHandleServ(void)
+{
+    if ( iapRte.rxBufState == Iap_BUFFER_FULL && iapRte.txBufState == Iap_BUFFER_IDLE) {
+        switch ( iapRte.rxPdu->datas[0] ) {
+            case IAP_CMD_DEF_SESSION:
+                Iap_DefaultSession_Service();
+                break;
+            case IAP_CMD_PRO_SESSION:
+                Iap_ProgrammingSession_Service();
+                break;
+            case IAP_CMD_EXT_SESSION:
+                Iap_ExternSession_Service();
+                break;
+            case IAP_CMD_STOP_COMMUN:
+                Iap_StopCommunication_Service();
+                break;
+            case IAP_CMD_ERASE:
+                Iap_Erase();
+                break;
+            case IAP_CMD_DOWNLOAD:
+                Iap_Downloadn();
+                break;
+            case IAP_CMD_TRANSING:
+                Iap_Transing();
+                break;
+            case IAP_CMD_TRANS_EXIT:
+                Iap_TransExit();
+                break;
+            case IAP_CMD_CHECK_APP:
+                Iap_CheckApp();
+                break;
+            case IAP_CMD_SOFT_RESET:
+                Iap_SoftReset();
+                break;
+            case IAP_CMD_KEEP_SESSION:
+                Iap_KeepSession();
+                break;
+            default:
+                break;
+        }
+    }
+}
 
-static void Iap_DefSession(void)
+static void Iap_DefaultSession_Service(void)
 {
+    iapRte.sessionLv = Defalut_session;
+    iapRte.sessionTick = 0;
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
-static void Iap_ProSession(void)
+
+static void Iap_ProgrammingSession_Service(void)
 {
+    if (iapRte.sessionLv != Extern_session) {
+        Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+    }
+    iapRte.sessionLv = Programming_session;
+    iapRte.sessionTick = IAP_SET_TIMER(SESSION_TIMER_CNT);
+    Iap_NegativeResponse(IAP_DEPENDING);
 }
-static void Iap_ExtSession(void)
+
+static void Iap_ExternSession_Service(void)
 {
-    iapTxPduInfo.len = 0x01;
-    Iap_Transmit(IAP_ACK);
+    iapRte.sessionLv = Extern_session;
+    iapRte.sessionTick = IAP_SET_TIMER(SESSION_TIMER_CNT);
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
-static void Iap_StopCommun(void)
+static void Iap_StopCommunication_Service(void)
 {
+    if (iapRte.sessionLv != Extern_session) {
+        Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+    }
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
+
 static void Iap_Erase(void)
 {
+
 }
+
 static void Iap_Downloadn(void)
 {
+
 }
+
 static void Iap_Transing(void)
 {
+
 }
+
 static void Iap_TransExit(void)
 {
+    if (iapRte.sessionLv != Extern_session) {
+        Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+    }
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
+
 static void Iap_CheckApp(void)
 {
+    if (iapRte.sessionLv != Extern_session) {
+        Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+    }
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
 
 static void Iap_SoftReset(void)
 {
-}
-static void Iap_KeepSession(void)
-{
+    if (iapRte.sessionLv != Extern_session) {
+        Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+    }
+    iapRte.txCfirmReset = TRUE;
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
 
-static void Iap_Transmit(uint8 ack)
+static void Iap_KeepSession(void)
+{
+    iapRte.sessionTick = IAP_SET_TIMER(SESSION_TIMER_CNT);
+}
+
+static void Iap_PositiveResponse(void)
 {
     if (iapRte.txBufState == Iap_BUFFER_IDLE) {
         iapRte.rxBufState = Iap_BUFFER_IDLE;
-        iapRte.txPdu->cmd = iapRte.rxPdu->cmd;
-        iapRte.txPdu->datas[0] = ack;
         iapRte.txBufState = Iap_BUFFER_FULL;
+        iapRte.txPdu->len = TXLEN;
+        iapRte.txPdu->datas[0] = iapRte.rxPdu->datas[0] + 0x40;
         PduR_Transmit(PDUR_RX_PUDID_ON_OTA_RSP,iapRte.txPdu);
+        TXLEN = 0;
+    }
+}
+
+static void Iap_NegativeResponse(uint8 ack)
+{
+    if (iapRte.txBufState == Iap_BUFFER_IDLE) {
+        iapRte.rxBufState = Iap_BUFFER_IDLE;
+        iapRte.txBufState = Iap_BUFFER_FULL;
+        iapRte.txPdu->len = 0x03;
+        iapRte.txPdu->datas[0] = 0x7F;
+        iapRte.txPdu->datas[1] = iapRte.rxPdu->datas[0];
+        iapRte.txPdu->datas[2] = ack;
+        PduR_Transmit(PDUR_RX_PUDID_ON_OTA_RSP,iapRte.txPdu);
+    }
+}
+
+/**
+* Iap_lAppendTx
+*
+* @param data:data
+* @return none
+*
+* @brief  iap append tx data
+*/
+static void Iap_lAppendTx(uint8 data)
+{
+    if (TXLEN + 1 < IAP_TX_BUF_SIAZE) {
+        TXLEN++;
+        iapRte.txPdu->datas[TXLEN] = data;
+    }
+}
+
+/**
+* Iap_lHandleReset
+*
+* @return none
+*
+* @brief reset handle
+*/
+static void Iap_lHandleReset(void)
+{
+    if (iapRte.resetPerformTick > 1) {
+        iapRte.resetPerformTick--;
+    }
+    if (iapRte.resetPerformTick == 1) {
+        iapRte.resetPerformTick = 0;
+        Rte_McuPerformReset(); /* System reset, reset MCU */
     }
 }
