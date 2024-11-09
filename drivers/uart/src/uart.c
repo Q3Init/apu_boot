@@ -113,7 +113,7 @@ bool uart_read(uint8_t channel_id, void *buffer, uint16_t *len)
  * @return FALSE - Failed
  *         TRUE  - SUCCESS
  */
-bool uart_write(uint8_t channel_id, void *buffer, uint16_t *len)
+bool uart_write(uint8_t channel_id, void *buffer, uint16_t len)
 {
     bool ret = FALSE;
 
@@ -141,4 +141,3 @@ void uart_register(const uart_device_t *p_dev)
         gp_uart_device = p_dev;
     }
 }
-

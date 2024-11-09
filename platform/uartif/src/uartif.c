@@ -154,7 +154,7 @@ void UartIf_RxIndicaiton(const uint8 *datas, uint16 dlc, uint8 uartIndex)
 */
 void UartIf_TxConfirmation(void)
 {
-    InterTp_UartTxConfirmation();
+    InterTp_UartTxConfirmation( );
 }
 
 /**

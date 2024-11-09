@@ -16,4 +16,3 @@ typedef struct flash_device
 } flash_device_t;
 
 #endif
-

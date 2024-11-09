@@ -4,10 +4,6 @@
 #include "platform_types.h"
 #include "flash_type.h"
 
-#define DFLASH_TYPE (1u)
-#define PFLASH_TYPE (2u)
-#define INTERNAL_PFLASH_DRIVER_INDEX (0u)
-
 /**
  * @brief initialize Flash device
  */
@@ -98,4 +94,3 @@ uint32_t flash_get_page_size(const uint8_t driver_index, uint8_t flash_type);
 std_return_t flash_register(const flash_device_t *p_dev, uint8_t device_num);
 
 #endif
-

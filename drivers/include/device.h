@@ -24,8 +24,8 @@ static void device_null(void)
  * the driver is not compiled in, the function is still declared and can
  * be used, but aliases to device_null() and thus is optimized away.
  */
-#define DEVICE_INITFUNC(name)					\
-	void name(void)						\
+#define DEVICE_INITFUNC(name) \
+	void name(void)           \
 		__attribute__((weak, alias("device_null")));
 
 #endif

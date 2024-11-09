@@ -133,6 +133,18 @@ typedef unsigned char       boolean;        /* for use with TRUE/FALSE        */
    #define STD_OFF 0U
 #endif
 
+/* Suppress warning messages */
+#if defined(__CC_ARM)
+// Suppress warning message: extended constant initialiser used
+#pragma diag_suppress 1296
+#elif defined(__ICCARM__)
+#elif defined(__GNUC__)
+#endif
+
+/* USER CODE END PM */
+
+#endif /* PLATFORM_TYPES_H */
+
 /*******************************************************************************
 **                      Global Data                                           **
 *******************************************************************************/
@@ -140,5 +152,6 @@ typedef unsigned char       boolean;        /* for use with TRUE/FALSE        */
 /*******************************************************************************
 **                      Global Function Prototypes                            **
 *******************************************************************************/
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
 
-#endif /* PLATFORM_TYPES_H */

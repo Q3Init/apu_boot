@@ -224,4 +224,3 @@ std_return_t flash_register(const flash_device_t *p_dev, uint8_t device_num)
 
     return ret;
 }
-

@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>APM32E103_MIN,EASY_OS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\inc;..\..\os\easyos\OS_Driver;..\..\os\easyos\OS_Task;..\..\types;..\..\lib\chip_libraries\APM32E103VE\drivers\inc;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\core_support;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\device_support;..\..\config\chip_int-cfg\APM32E103VE\inc;..\..\config\os-cfg\easyos-cfg\inc;..\..\platform\bootcheck\inc;..\..\platform\iap\inc;..\..\platform\intertp\inc;..\..\platform\pdur\inc;..\..\platform\uartif\inc;..\..\config\platform-cfg\bootcheck\inc;..\..\config\platform-cfg\iap\inc;..\..\config\platform-cfg\intertp\inc;..\..\config\platform-cfg\pdur\inc;..\..\config\platform-cfg\uartif\inc;..\..\drivers\crc\inc;..\..\drivers\flash\inc;..\..\drivers\gpio\inc;..\..\drivers\uart\inc;..\..\drivers\include;..\..\config\driver-cfg\flash\inc;..\..\config\driver-cfg\gpio\inc;..\..\config\driver-cfg\uart\inc</IncludePath>
+              <IncludePath>..\inc;..\..\os\easyos\OS_Driver;..\..\os\easyos\OS_Task;..\..\types;..\..\lib\chip_libraries\APM32E103VE\drivers\inc;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\core_support;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\device_support;..\..\config\chip_int-cfg\APM32E103VE\inc;..\..\config\os-cfg\easyos-cfg\inc;..\..\platform\bootcheck\inc;..\..\platform\iap\inc;..\..\platform\intertp\inc;..\..\platform\pdur\inc;..\..\platform\uartif\inc;..\..\config\platform-cfg\bootcheck\inc;..\..\config\platform-cfg\iap\inc;..\..\config\platform-cfg\intertp\inc;..\..\config\platform-cfg\pdur\inc;..\..\config\platform-cfg\uartif\inc;..\..\drivers\crc\inc;..\..\drivers\flash\inc;..\..\drivers\gpio\inc;..\..\drivers\uart\inc;..\..\drivers\include;..\..\config\driver-cfg\flash\inc;..\..\config\driver-cfg\gpio\inc;..\..\config\driver-cfg\uart\inc;..\..\drivers\clock\inc;..\..\config\driver-cfg\clock\inc;..\..\config\driver-cfg\dma\inc;..\..\drivers\dma\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -421,6 +421,31 @@
               <FileType>1</FileType>
               <FilePath>..\..\config\platform-cfg\uartif\src\uartif_cfg.c</FilePath>
             </File>
+            <File>
+              <FileName>flash_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\driver-cfg\flash\src\flash_cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\driver-cfg\gpio\src\gpio_cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\driver-cfg\uart\src\uart_cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>dma_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\driver-cfg\dma\src\dma_cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>clock_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\config\driver-cfg\clock\src\clock_cfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -446,11 +471,26 @@
               <FileType>1</FileType>
               <FilePath>..\..\drivers\uart\src\uart.c</FilePath>
             </File>
+            <File>
+              <FileName>clock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\clock\src\clock.c</FilePath>
+            </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\dma\src\dma.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>apm32e103vet6</GroupName>
           <Files>
+            <File>
+              <FileName>apm32e103vet6_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\dma\src\apm32e103vet6_dma.c</FilePath>
+            </File>
             <File>
               <FileName>apm32e103vet6_flash.c</FileName>
               <FileType>1</FileType>
@@ -465,6 +505,11 @@
               <FileName>apm32e103vet6_uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\drivers\uart\src\apm32e103vet6_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32e103vet6_clock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\clock\src\apm32e103vet6_clock.c</FilePath>
             </File>
           </Files>
         </Group>
