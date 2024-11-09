@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>APM32E103_MIN,EASY_OS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\inc;..\..\os\easyos\OS_Driver;..\..\os\easyos\OS_Task;..\..\types;..\..\lib\chip_libraries\APM32E103VE\drivers\inc;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\core_support;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\device_support;..\..\config\chip_int-cfg\APM32E103VE\inc;..\..\config\os-cfg\easyos-cfg\inc;..\..\platform\bootcheck\inc;..\..\platform\iap\inc;..\..\platform\intertp\inc;..\..\platform\pdur\inc;..\..\platform\uartif\inc;..\..\config\platform-cfg\bootcheck\inc;..\..\config\platform-cfg\iap\inc;..\..\config\platform-cfg\intertp\inc;..\..\config\platform-cfg\pdur\inc;..\..\config\platform-cfg\uartif\inc;..\..\drivers\crc\inc</IncludePath>
+              <IncludePath>..\inc;..\..\os\easyos\OS_Driver;..\..\os\easyos\OS_Task;..\..\types;..\..\lib\chip_libraries\APM32E103VE\drivers\inc;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\core_support;..\..\lib\chip_libraries\APM32E103VE\cmsis\cm3\device_support;..\..\config\chip_int-cfg\APM32E103VE\inc;..\..\config\os-cfg\easyos-cfg\inc;..\..\platform\bootcheck\inc;..\..\platform\iap\inc;..\..\platform\intertp\inc;..\..\platform\pdur\inc;..\..\platform\uartif\inc;..\..\config\platform-cfg\bootcheck\inc;..\..\config\platform-cfg\iap\inc;..\..\config\platform-cfg\intertp\inc;..\..\config\platform-cfg\pdur\inc;..\..\config\platform-cfg\uartif\inc;..\..\drivers\crc\inc;..\..\drivers\flash\inc;..\..\drivers\gpio\inc;..\..\drivers\uart\inc;..\..\drivers\include;..\..\config\driver-cfg\flash\inc;..\..\config\driver-cfg\gpio\inc;..\..\config\driver-cfg\uart\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -430,6 +430,41 @@
               <FileName>crc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\drivers\crc\src\crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\flash\src\flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\gpio\src\gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\uart\src\uart.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>apm32e103vet6</GroupName>
+          <Files>
+            <File>
+              <FileName>apm32e103vet6_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\flash\src\apm32e103vet6_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32e103vet6_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\gpio\src\apm32e103vet6_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32e103vet6_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\drivers\uart\src\apm32e103vet6_uart.c</FilePath>
             </File>
           </Files>
         </Group>

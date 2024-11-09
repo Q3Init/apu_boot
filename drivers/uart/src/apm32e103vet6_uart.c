@@ -1,50 +1,59 @@
-
 /******************************************************************************/
 /*---------------------------    Include      --------------------------------*/
 /******************************************************************************/
-#include "gpio_type.h"
-#include "gpio_cfg.h"
+#include "uart_type.h"
+#include "uart_cfg.h"
 /******************************************************************************/
 /*----------------------------Local  Function --------------------------------*/
 /******************************************************************************/
 /**
  * @brief initialize APM32E10xx GPIO interface
  */
-static void apm32e10xx_gpio_init(void)
+static std_return_t apm32e10xx_uart_init(void)
 {
-    ;;
+    bool ret = FALSE;
+
+    if (1)
+    {
+        ret = TRUE;
+    }
+
+    return ret;
 }
 
 /**
  * @brief de-initialize APM32E10xx GPIO interface
  */
-static void apm32e10xx_gpio_deinit(void)
+static std_return_t apm32e10xx_uart_deinit(void)
 {
-    ;;
+    bool ret = FALSE;
+
+    if (1)
+    {
+        ret = TRUE;
+    }
+
+    return ret;
 }
 
-/** 
- * @brief write/update a gpio pin 
- * 
- * @param port : port number
- * @param pin :  pin number
- * @param val : set new value
+/**
+ * @brief send data to serial port
+ *
+ * @param channel_id  - uart channel ID
+ * @param data   - pointer to read buffer
+ * @param count  - number of data
+ *
+ * @return TRUE  - if success
+ * @return FALSE - otherwise
  */
-static void apm32e10xx_gpio_write(uint32_t port, uint16_t pin, uint8_t val)
+static bool apm32e10xx_write_buffer(uint8_t channel_id, void *data, uint16_t *count)
 {
-    
-}
+    bool ret = FALSE;
 
-/** 
- * @brief read from a gpio pin
- * 
- * @param port : port number
- * @param pin :  pin number
- */
-static uint8_t apm32e10xx_gpio_read(uint32_t port, uint16_t pin)
-{
-    uint8_t ret = 0xffu;
-
+    if (1)
+    {
+        ret = TRUE;
+    }
 
     return ret;
 }
@@ -52,20 +61,20 @@ static uint8_t apm32e10xx_gpio_read(uint32_t port, uint16_t pin)
 /******************************************************************************/
 /*-------------------  Local Variable Definitions    -------------------------*/
 /******************************************************************************/
-static const gpio_device_t apm32e10xx_gpio_device = 
-{
-    .init   = apm32e10xx_gpio_init,
-    .write  = apm32e10xx_gpio_write,
-    .read   = apm32e10xx_gpio_read,
-    .deinit = apm32e10xx_gpio_deinit,
+static const uart_device_t apm32e10xx_uart_device =
+    {
+        .init = apm32e10xx_uart_init,
+        .write = apm32e10xx_write_buffer,
+        // .read = apm32e10xx_uart_read,
+        .deinit = apm32e10xx_uart_deinit,
 };
 /******************************************************************************/
 /*----------------------------Global Function --------------------------------*/
 /******************************************************************************/
-/** 
- * @brief register s32k3xx gpio device to gpio wrapper
+/**
+ * @brief register s32k3xx uart device to uart wrapper
  */
-void s32k3xx_gpio_preinit(void)
+void s32k3xx_uart_preinit(void)
 {
-    gpio_register(&apm32e10xx_gpio_device);
+    uart_register(&apm32e10xx_uart_device);
 }
