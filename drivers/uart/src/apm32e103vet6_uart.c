@@ -101,7 +101,7 @@ static const uart_device_t apm32e10xx_uart_device =
 /**
  * @brief register s32k3xx uart device to uart wrapper
  */
-void s32k3xx_uart_preinit(void)
+void apm32exx_uart_preinit(void)
 {
     uart_register(&apm32e10xx_uart_device);
 }
@@ -120,7 +120,7 @@ void USART1_IRQHandler(void)
         DMA_Disable(DMA1_Channel4);
         DMA_ClearStatusFlag(DMA1_FLAG_TC4);
         USART_ClearStatusFlag(uartSignalsCfgTable[0].uart, USART_FLAG_TXC);
-        UartIf_TxConfirmation( );
+        UartIf_TxConfirmation();
     }
 
     if (USART_ReadStatusFlag(uartSignalsCfgTable[0].uart, USART_FLAG_IDLE) != RESET)
@@ -145,6 +145,7 @@ void USART1_IRQHandler(void)
         if (DMA_USART1_RxMsg.DMA_USART_Len == (dataLen + 7))
         {
             UartIf_RxIndicaiton(DMA_USART1_RxMsg.DMA_USART_Buf, DMA_USART1_RxMsg.DMA_USART_Len, 0);
+//			uart_write(0,DMA_USART1_RxMsg.DMA_USART_Buf,DMA_USART1_RxMsg.DMA_USART_Len);
         }
         DMA_Enable(DMA1_Channel5);
     }

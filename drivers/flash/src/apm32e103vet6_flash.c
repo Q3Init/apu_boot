@@ -141,7 +141,7 @@ static const flash_device_t apm32e10xflash_device =
 /**
  * @brief register apm32e10x flash device to flash wrapper
  */
-void apm32e10xflash_preinit(void)
+void apm32exx_flash_preinit(void)
 {
     flash_register(&apm32e10xflash_device, 1);
 }

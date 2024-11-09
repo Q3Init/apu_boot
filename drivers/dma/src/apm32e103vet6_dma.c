@@ -55,9 +55,9 @@ static const dma_device_t apm32e10xx_dma_device =
 /*----------------------------Global Function --------------------------------*/
 /******************************************************************************/
 /**
- * @brief register s32k3xx dma device to dma wrapper
+ * @brief register apm32e10xx dma device to dma wrapper
  */
-void s32k3xx_dma_preinit(void)
+void apm32exx_dma_preinit(void)
 {
     dma_register(&apm32e10xx_dma_device);
 }

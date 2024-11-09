@@ -19,6 +19,10 @@
 #include "clock.h"
 #endif
 
+#ifdef CONFIG_DMA
+#include "dma.h"
+#endif
+
 #include "uartif.h"
 #include "intertp.h"
 #include "iap.h"
@@ -35,6 +39,12 @@ void rte_init(void)
     OsEvt_Init();
     OsTimer_Init();
 #endif
+#ifdef CONFIG_CLOCK
+	clock_init( );
+#endif
+#ifdef CONFIG_DMA
+    dma_init( );
+#endif
 #ifdef CONFIG_GPIO
     gpio_init();
 #endif
@@ -42,11 +52,9 @@ void rte_init(void)
     uart_init();
 #endif
 #ifdef CONFIG_FLASH
-    flash_init();
+    flash_init(1);
 #endif
-#ifdef CONFIG_CLOCK
-    clock_init();
-#endif
+
     UartIf_Init();
     InterTp_Init();
     Iap_Init();   

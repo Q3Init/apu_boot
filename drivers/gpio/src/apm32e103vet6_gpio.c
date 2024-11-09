@@ -119,9 +119,9 @@ static const gpio_device_t apm32e10xx_gpio_device =
 /*----------------------------Global Function --------------------------------*/
 /******************************************************************************/
 /**
- * @brief register s32k3xx gpio device to gpio wrapper
+ * @brief register apm32e10xx gpio device to gpio wrapper
  */
-void s32k3xx_gpio_preinit(void)
+void apm32exx_gpio_preinit(void)
 {
 	gpio_register(&apm32e10xx_gpio_device);
 }

@@ -12,9 +12,18 @@
  */
 static std_return_t apm32e10xx_clock_init(void)
 {
-    bool ret = FALSE;
-	
-    return ret;
+	bool ret = FALSE;
+	RCM_EnableAHBPeriphClock(RCM_AHB_PERIPH_DMA1);
+	RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_GPIOA);
+	RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_GPIOB);
+	RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_GPIOC);
+	RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_GPIOD);
+	RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_GPIOC);
+	RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_GPIOE);
+	RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_USART1);
+	RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_USART2);
+
+	return ret;
 }
 
 /**
@@ -22,18 +31,18 @@ static std_return_t apm32e10xx_clock_init(void)
  */
 static std_return_t apm32e10xx_clock_deinit(void)
 {
-    bool ret = TRUE;
+	bool ret = TRUE;
 
-    return ret;
+	return ret;
 }
 
 /******************************************************************************/
 /*-------------------  Local Variable Definitions    -------------------------*/
 /******************************************************************************/
 static const clock_device_t apm32e10xx_clock_device =
-    {
-        .init = apm32e10xx_clock_init,
-        .deinit = apm32e10xx_clock_deinit,
+	{
+		.init = apm32e10xx_clock_init,
+		.deinit = apm32e10xx_clock_deinit,
 };
 /******************************************************************************/
 /*----------------------------Global Function --------------------------------*/
@@ -41,7 +50,7 @@ static const clock_device_t apm32e10xx_clock_device =
 /**
  * @brief register s32k3xx clock device to clock wrapper
  */
-void s32k3xx_clock_preinit(void)
+void apm32exx_clock_preinit(void)
 {
-    clock_register(&apm32e10xx_clock_device);
+	clock_register(&apm32e10xx_clock_device);
 }
