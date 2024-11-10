@@ -1,7 +1,7 @@
 #include "dma_cfg.h"
 
-USART_BuffMsg_t DMA_USART1_RxMsg;
-USART_BuffMsg_t DMA_USART1_TxMsg = {{11, 22}, 0};
+USART_BuffMsg_t DMA_USART1_RxMsg = {{0}, 0};;
+USART_BuffMsg_t DMA_USART1_TxMsg = {{0}, 0};
 
 DMASignalsCfg dmaSignalsCfgTable[DMA_SIGNALS_CNT] =
 {

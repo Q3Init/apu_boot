@@ -317,7 +317,8 @@ static void Iap_ProgrammingSession_Service(void)
     }
     iapRte.sessionLv = Programming_session;
     iapRte.sessionTick = IAP_SET_TIMER(SESSION_TIMER_CNT);
-    Iap_NegativeResponse(IAP_DEPENDING);
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
 
 static void Iap_ExternSession_Service(void)
@@ -329,7 +330,7 @@ static void Iap_ExternSession_Service(void)
 }
 static void Iap_StopCommunication_Service(void)
 {
-    if (iapRte.sessionLv != Extern_session) {
+    if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
     }
     Iap_lAppendTx(IAP_ACK);
@@ -338,22 +339,34 @@ static void Iap_StopCommunication_Service(void)
 
 static void Iap_Erase(void)
 {
-
+    if (iapRte.sessionLv == Defalut_session) {
+        Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+    }
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
 
 static void Iap_Downloadn(void)
 {
-
+    if (iapRte.sessionLv == Defalut_session) {
+        Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+    }
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
 
 static void Iap_Transing(void)
 {
-
+    if (iapRte.sessionLv == Defalut_session) {
+        Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+    }
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
 
 static void Iap_TransExit(void)
 {
-    if (iapRte.sessionLv != Extern_session) {
+    if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
     }
     Iap_lAppendTx(IAP_ACK);
@@ -362,7 +375,7 @@ static void Iap_TransExit(void)
 
 static void Iap_CheckApp(void)
 {
-    if (iapRte.sessionLv != Extern_session) {
+    if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
     }
     Iap_lAppendTx(IAP_ACK);
@@ -371,7 +384,7 @@ static void Iap_CheckApp(void)
 
 static void Iap_SoftReset(void)
 {
-    if (iapRte.sessionLv != Extern_session) {
+    if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
     }
     iapRte.txCfirmReset = TRUE;
@@ -383,6 +396,7 @@ static void Iap_KeepSession(void)
 {
     iapRte.sessionTick = IAP_SET_TIMER(SESSION_TIMER_CNT);
     iapRte.rxBufState = Iap_BUFFER_IDLE;
+    memset(iapRxBuf,0,sizeof(iapRxBuf));
 }
 
 static void Iap_PositiveResponse(void)

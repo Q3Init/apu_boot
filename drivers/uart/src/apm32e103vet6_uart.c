@@ -69,12 +69,12 @@ static bool apm32e10xx_write_buffer(uint8_t channel_id, void *data, uint16_t cou
     bool ret = FALSE;
     if (channel_id == INTERNAL_UART0_DRIVER_INDEX)
     {
-        DMA_ConfigDataNumber(DMA1_Channel4, count); // ����TXͨ���ڴ����
+        DMA_ConfigDataNumber(DMA1_Channel4, count);
 
         DMA1_Channel4->CHCFG |= (1 << 7);
 
         DMA1_Channel4->CHMADDR = (uint32_t)data;
-
+        DMA_Disable(DMA1_Channel5);
         DMA_Enable(DMA1_Channel4);
 
         ret = TRUE;
@@ -111,16 +111,20 @@ void apm32exx_uart_preinit(void)
  * @param
  * @retval
  */
+uint8 enter_cnt;
 void USART1_IRQHandler(void)
 {
 
     uint16 dataLen = 0;
     if (USART_ReadStatusFlag(uartSignalsCfgTable[0].uart, USART_FLAG_TXC) != RESET)
-    {
-        DMA_Disable(DMA1_Channel4);
+    { 
+        uartSignalsCfgTable[0].uart->STS;
+        uartSignalsCfgTable[0].uart->DATA;
         DMA_ClearStatusFlag(DMA1_FLAG_TC4);
         USART_ClearStatusFlag(uartSignalsCfgTable[0].uart, USART_FLAG_TXC);
         UartIf_TxConfirmation();
+        DMA_Disable(DMA1_Channel4);
+        DMA_Enable(DMA1_Channel5);
     }
 
     if (USART_ReadStatusFlag(uartSignalsCfgTable[0].uart, USART_FLAG_IDLE) != RESET)
@@ -129,24 +133,19 @@ void USART1_IRQHandler(void)
         uartSignalsCfgTable[0].uart->DATA;
 
         DMA_Disable(DMA1_Channel5);
-
         DMA_USART1_RxMsg.DMA_USART_Len = 512 - DMA_ReadDataNumber(DMA1_Channel5);
 
-        DMA_ConfigDataNumber(DMA1_Channel5, 512); // ����RXͨ���ڴ����
+        dataLen = (DMA_USART1_RxMsg.DMA_USART_Buf[2] << 8) + (DMA_USART1_RxMsg.DMA_USART_Buf[3]);
 
-        DMA1_Channel5->CHCFG |= (1 << 7);
-
-        DMA1_Channel5->CHMADDR = (uint32_t)DMA_USART1_RxMsg.DMA_USART_Buf;
-
-        dataLen = (uint16)(DMA_USART1_RxMsg.DMA_USART_Buf[2] << 8) + (uint16)(DMA_USART1_RxMsg.DMA_USART_Buf[3]);
-
-        // InterTp_UartRxIndication( BUS_UART1,DMA_USART1_RxMsg.DMA_USART_Buf,DMA_USART1_RxMsg.DMA_USART_Len);
-        //  HEAD+ID+CMD+DLC+CRC = 7BYTE
         if (DMA_USART1_RxMsg.DMA_USART_Len == (dataLen + 6))
         {
+            enter_cnt++;
             UartIf_RxIndicaiton(DMA_USART1_RxMsg.DMA_USART_Buf, DMA_USART1_RxMsg.DMA_USART_Len, 0);
-//			uart_write(0,DMA_USART1_RxMsg.DMA_USART_Buf,DMA_USART1_RxMsg.DMA_USART_Len);
         }
+        
+        DMA1_Channel5->CHCFG |= (1 << 7);
+        DMA1_Channel5->CHMADDR = (uint32_t)DMA_USART1_RxMsg.DMA_USART_Buf;
+        DMA_ConfigDataNumber(DMA1_Channel5, 512);
         DMA_Enable(DMA1_Channel5);
     }
 }
