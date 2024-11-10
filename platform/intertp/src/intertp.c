@@ -132,11 +132,11 @@ boolean InterTp_Transmit( uint16 pduId, const uint8* datas, uint16 len )
             interTpTransmitMsgBuf[ 3 ] = (uint8)( len );
             memcpy( &interTpTransmitMsgBuf[ 4 ], datas, len );
             crc                              = InterTp_CalXor( &interTpTransmitMsgBuf[ 0 ], len + 4 );
-            interTpTransmitMsgBuf[ len + 4 ] = (uint8)( crc >> 8 );
-            interTpTransmitMsgBuf[ len + 5 ] = (uint8)( crc );
+            interTpTransmitMsgBuf[ len + 4 ] = (uint8)( crc );
+            interTpTransmitMsgBuf[ len + 5 ] = (uint8)( crc >> 8);
             if ( interTpPdusCfgTable[ pduId ].dest == INTERTP_UART )
             {
-                ret = InterTp_UartTransmit( interTpTransmitMsgBuf, len + 7, interTpPdusCfgTable[ pduId ].bus );
+                ret = InterTp_UartTransmit( interTpTransmitMsgBuf, len + 6, interTpPdusCfgTable[ pduId ].bus );
             }
         }
     }
@@ -169,6 +169,7 @@ static void InterTp_lRxIndication( uint8 srcModule, const uint8* datas, uint16 l
     uint8                  data;
     uint16                 pduId;
     uint8                  rxDatas[ INTER_TP_RX_SIZE ];
+    uint8                  xor_buf[ INTER_TP_RX_SIZE ];
     PduInfoType            pdu;
     pdu.datas = rxDatas;
     if ( srcModule >= INTER_MODULES_CNT )
@@ -179,6 +180,7 @@ static void InterTp_lRxIndication( uint8 srcModule, const uint8* datas, uint16 l
     for ( i = 0; i < len; i++ ) 
     {
         data = datas[ i ];
+        xor_buf[i] = datas[ i ];
         switch ( objPtr->step )
         {
             case INTER_TP_WAIT_HEADER:
@@ -230,7 +232,7 @@ static void InterTp_lRxIndication( uint8 srcModule, const uint8* datas, uint16 l
                 objPtr->fieldBytesCnt++;
                 if ( objPtr->fieldBytesCnt == INTER_TP_XOR_CNT )
                 {
-                    if ( objPtr->msg.Xor.val == InterTp_CalXor( datas, len - 2 ) )
+                    if ( objPtr->msg.Xor.val == InterTp_CalXor( xor_buf, (objPtr->msg.dlc.val + 4)) )
                     {
                         for ( pduId = 0; pduId < INTERTP_RX_PDUS_CNT; pduId++ )
                         {

@@ -28,10 +28,6 @@ typedef struct {
         uint8 buf[1];
     } id;
     union {
-        uint8 val;
-        uint8 buf[1];
-    } cmd;
-    union {
         uint16 val;
         uint8 buf[2];
     } dlc;

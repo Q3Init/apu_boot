@@ -16,6 +16,8 @@
 #include <string.h>
 #include "uartif.h"
 #include "intertp.h"
+#include "uart.h"
+#include "uart_cfg.h"
 #if UART_CNT > 0
 /*******************************************************************************
 **                      Imported Compiler Switch Check                        **
@@ -61,14 +63,14 @@ static void UartIf_lMainFunctionTx(void);
 /*******************************************************************************
 **                      Private Variable Definitions                          **
 *******************************************************************************/
-static uint8 uartIfRxDatas[UART_CNT][UARTIF_RX_FIFO_SIZE];
-static uint8 uartIfTxDatas[UART_CNT][UARTIF_TX_FIFO_SIZE];
+uint8 uartIfRxDatas[UART_CNT][UARTIF_RX_FIFO_SIZE];
+uint8 uartIfTxDatas[UART_CNT][UARTIF_TX_FIFO_SIZE];
 
-static uint8 uartIfRxBuf[UART_CNT][UARTIF_RX_HDL_SIZE_EACH_CYCLE];
-static uint8 uartIfTxBuf[UART_CNT][UARTIF_TX_HDL_SIZE_EACH_CYCLE];
+uint8 uartIfRxBuf[UART_CNT][UARTIF_RX_HDL_SIZE_EACH_CYCLE];
+uint8 uartIfTxBuf[UART_CNT][UARTIF_TX_HDL_SIZE_EACH_CYCLE];
 
-static UartIfFifoType uartIfRxFifo[UART_CNT];
-static UartIfFifoType uartIfTxFifo[UART_CNT];
+UartIfFifoType uartIfRxFifo[UART_CNT];
+UartIfFifoType uartIfTxFifo[UART_CNT];
 /*******************************************************************************
 **                      Global Function Definitions                           **
 *******************************************************************************/
@@ -204,9 +206,7 @@ static void UartIf_lMainFunctionRx(void)
         if (len > 0) {
             InterTp_UartRxIndication(uartIndex,uartIfRxBuf[uartIndex], len);
         }
-        
     }
-    
 }
 
 /**
@@ -238,7 +238,7 @@ static void UartIf_lMainFunctionTx(void)
             }
         }
         if (len > 0) {
-            UartIfCfg_Write(uartIndex, uartIfTxBuf[uartIndex], len);
+            uart_write(INTERNAL_UART0_DRIVER_INDEX, uartIfTxBuf[uartIndex], len);
         }
     }
 }

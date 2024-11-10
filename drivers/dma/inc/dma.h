@@ -35,6 +35,6 @@ void dma_flush(void);
  * @return FALSE - Failed
  *         TRUE  - SUCCESS
  */
-bool dma_write(uint8_t channel_id, void *buffer, uint16_t *len);
+bool dma_write(uint8_t channel_id, void *buffer, uint16_t len);
 
 #endif

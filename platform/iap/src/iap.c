@@ -20,6 +20,7 @@
 #define SESSION_TIMER_CNT 5000
 #define IAP_ACK                      0x55
 #define IAP_SESSION_MISMATCH         0x01
+#define IAP_FUNCTION_MISMATCH        0x02
 #define IAP_DEPENDING                0x78
 
 #define IAP_SET_TIMER(time) ((((time) + 5 / 2) / 5) + 1)
@@ -32,16 +33,16 @@
 *******************************************************************************/
 typedef enum
 {
-    IAP_CMD_DEF_SESSION  = 0xA1, 
-    IAP_CMD_PRO_SESSION  = 0xA2, 
-    IAP_CMD_EXT_SESSION  = 0xA3, 
-    IAP_CMD_STOP_COMMUN  = 0xA4, 
-    IAP_CMD_ERASE        = 0xA5, 
-    IAP_CMD_DOWNLOAD     = 0xA6, 
-    IAP_CMD_TRANSING     = 0xA7,
-    IAP_CMD_TRANS_EXIT   = 0xA8,
-    IAP_CMD_CHECK_APP    = 0xA9,
-    IAP_CMD_SOFT_RESET   = 0xAA,
+    IAP_CMD_DEF_SESSION  = 0x01, 
+    IAP_CMD_PRO_SESSION  = 0x02, 
+    IAP_CMD_EXT_SESSION  = 0x03, 
+    IAP_CMD_STOP_COMMUN  = 0x04, 
+    IAP_CMD_ERASE        = 0x05, 
+    IAP_CMD_DOWNLOAD     = 0x06, 
+    IAP_CMD_TRANSING     = 0x07,
+    IAP_CMD_TRANS_EXIT   = 0x08,
+    IAP_CMD_CHECK_APP    = 0x09,
+    IAP_CMD_SOFT_RESET   = 0x0A,
     IAP_CMD_KEEP_SESSION = 0x3E,
 } IAP_CMD_t;
 
@@ -295,6 +296,7 @@ static void Iap_lHandleServ(void)
                 Iap_KeepSession();
                 break;
             default:
+                Iap_NegativeResponse(IAP_FUNCTION_MISMATCH);
                 break;
         }
     }
@@ -380,6 +382,7 @@ static void Iap_SoftReset(void)
 static void Iap_KeepSession(void)
 {
     iapRte.sessionTick = IAP_SET_TIMER(SESSION_TIMER_CNT);
+    iapRte.rxBufState = Iap_BUFFER_IDLE;
 }
 
 static void Iap_PositiveResponse(void)

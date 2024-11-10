@@ -138,11 +138,11 @@ void USART1_IRQHandler(void)
 
         DMA1_Channel5->CHMADDR = (uint32_t)DMA_USART1_RxMsg.DMA_USART_Buf;
 
-        dataLen = (uint16)(DMA_USART1_RxMsg.DMA_USART_Buf[3] << 8) + (uint16)(DMA_USART1_RxMsg.DMA_USART_Buf[4]);
+        dataLen = (uint16)(DMA_USART1_RxMsg.DMA_USART_Buf[2] << 8) + (uint16)(DMA_USART1_RxMsg.DMA_USART_Buf[3]);
 
         // InterTp_UartRxIndication( BUS_UART1,DMA_USART1_RxMsg.DMA_USART_Buf,DMA_USART1_RxMsg.DMA_USART_Len);
         //  HEAD+ID+CMD+DLC+CRC = 7BYTE
-        if (DMA_USART1_RxMsg.DMA_USART_Len == (dataLen + 7))
+        if (DMA_USART1_RxMsg.DMA_USART_Len == (dataLen + 6))
         {
             UartIf_RxIndicaiton(DMA_USART1_RxMsg.DMA_USART_Buf, DMA_USART1_RxMsg.DMA_USART_Len, 0);
 //			uart_write(0,DMA_USART1_RxMsg.DMA_USART_Buf,DMA_USART1_RxMsg.DMA_USART_Len);
