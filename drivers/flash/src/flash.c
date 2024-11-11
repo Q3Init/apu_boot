@@ -32,14 +32,14 @@ static flash_state_t g_flash_state[CONFIG_MAX_FLASH_DRIVER_NUM] = {FLASH_UNINIT}
 /******************************************************************************/
 /*----------------------------Local Function ---------------------------------*/
 /******************************************************************************/
-DEVICE_INITFUNC(apm32e10xx_flash_preinit);
+DEVICE_INITFUNC(apm32exx_flash_preinit);
 
 /**
  * @brief preinitialize Flash module,register flash devices
  */
 static void flash_preinit(void)
 {
-    apm32e10xx_flash_preinit();
+    apm32exx_flash_preinit();
 }
 
 /******************************************************************************/
@@ -64,6 +64,7 @@ void flash_device_register(void)
  */
 void flash_init(const uint8_t driver_index)
 {
+	flash_device_register();
     if ((NULL != gp_flash_device[driver_index]) && (NULL != gp_flash_device[driver_index]->init))
     {
         gp_flash_device[driver_index]->init();

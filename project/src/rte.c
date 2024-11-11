@@ -52,7 +52,7 @@ void rte_init(void)
     uart_init();
 #endif
 #ifdef CONFIG_FLASH
-    flash_init(1);
+    flash_init(0);
 #endif
 
     UartIf_Init();

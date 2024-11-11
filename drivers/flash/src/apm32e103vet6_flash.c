@@ -4,10 +4,15 @@
 
 #include "flash_type.h"
 #include "flash.h"
+#include "flash_cfg.h"
 
 /******************************************************************************/
 /*---------------------------    Macro        --------------------------------*/
 /******************************************************************************/
+#define APM32_FLASH_PAGE_SIZE 0x800
+#define APM32_FLASH_SECTOR_SIZE 0x800
+#define APM32_FLASH_BASE_ADDR FMC_BASE
+#define APM32_FLASH_SIZE 0x80000
 
 /******************************************************************************/
 /*----------------------------Callback Function ------------------------------*/
@@ -53,7 +58,54 @@ static void apm32e10xflash_init(void)
 static std_return_t apm32e10xflash_erase(uint32_t start_addr, uint32_t size)
 {
     std_return_t ret_val = E_OK;
+    uint32_t index = 0;
+    uint32_t erase_addr = 0;
+    uint32_t offset_addr = 0;
+    if (((size <= 0) || (start_addr < APM32_FLASH_BASE_ADDR) ||
+         ((start_addr + size) >= (APM32_FLASH_BASE_ADDR + APM32_FLASH_SIZE)))) // 非法地址
+    {
+        return E_NOK;
+    }
 
+    if (((start_addr - APM32_FLASH_BASE_ADDR) % APM32_FLASH_PAGE_SIZE != 0) || (size % APM32_FLASH_PAGE_SIZE != 0))
+    {
+        return E_NOK;
+    }
+    // 进行FLASH编程
+    FMC_Unlock();
+
+    while (1)
+    {
+        offset_addr = start_addr - APM32_FLASH_BASE_ADDR;
+        index = offset_addr / APM32_FLASH_PAGE_SIZE;
+        erase_addr = index * APM32_FLASH_PAGE_SIZE + APM32_FLASH_BASE_ADDR;
+
+        if (FMC_STATUS_COMPLETE == FMC_ErasePage(erase_addr))
+        {
+            ret_val = E_OK;
+        }
+        else
+        {
+            ret_val = E_NOK;
+            break;
+        }
+        // 清除所有标志位
+        FMC_ClearStatusFlag(FMC_FLAG_OC);
+        FMC_ClearStatusFlag(FMC_FLAG_PE);
+        FMC_ClearStatusFlag(FMC_FLAG_WPE);
+        start_addr = erase_addr + APM32_FLASH_PAGE_SIZE;
+        if (size > APM32_FLASH_PAGE_SIZE)
+        {
+            size -= APM32_FLASH_PAGE_SIZE;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    // 退出FLASH编程
+    FMC_Lock();
     return ret_val;
 }
 
@@ -70,7 +122,32 @@ static std_return_t apm32e10xflash_erase(uint32_t start_addr, uint32_t size)
 static std_return_t apm32e10xflash_write(uint32_t start_addr, uint32_t size, uint32_t *p_data)
 {
     std_return_t ret_val = E_OK;
-
+    uint32_t i = 0;
+    if ((start_addr < APM32_FLASH_BASE_ADDR) || (start_addr >= (APM32_FLASH_BASE_ADDR + APM32_FLASH_SIZE)) ||
+        (start_addr + size) > (APM32_FLASH_BASE_ADDR + APM32_FLASH_SIZE)) // 非法
+    {
+        return E_NOK;
+    }
+    // 进行FLASH编程
+    FMC_Unlock();
+    for (i = 0; i < size; i++)
+    {
+        if (FMC_STATUS_COMPLETE == FMC_ProgramWord(start_addr + i*4, p_data[i]))
+        {
+            ret_val = E_OK;
+        }
+        else
+        {
+            ret_val = E_NOK;
+            break;
+        }
+    }
+    // 清除所有标志位
+    FMC_ClearStatusFlag(FMC_FLAG_OC);
+    FMC_ClearStatusFlag(FMC_FLAG_PE);
+    FMC_ClearStatusFlag(FMC_FLAG_WPE);
+    // 退出FLASH编程
+    FMC_Lock();
     return ret_val;
 }
 
@@ -87,6 +164,16 @@ static std_return_t apm32e10xflash_write(uint32_t start_addr, uint32_t size, uin
 static bool apm32e10xflash_read(uint32_t address, uint32_t length, uint32_t *p_buffer)
 {
     std_return_t ret_val = E_OK;
+    uint32_t i = 0;
+    if ((address < APM32_FLASH_BASE_ADDR) || (address >= (APM32_FLASH_BASE_ADDR + APM32_FLASH_SIZE)) ||
+        (address + length) > (APM32_FLASH_BASE_ADDR + APM32_FLASH_SIZE)) // 非法
+    {
+        return E_NOK;
+    }
+    for (i = 0; i < length; i++)
+    {
+        p_buffer[i] = *(volatile uint32_t *)(address + i);
+    }
 
     return ret_val;
 }
@@ -132,7 +219,7 @@ static const flash_device_t apm32e10xflash_device =
         .erase = apm32e10xflash_erase,
         .get_sector_size = apm32e10xflash_get_sector_size,
         .get_page_size = apm32e10xflash_get_page_size,
-        .flash_driver_index = 1,
+        .flash_driver_index = 0,
 };
 
 /******************************************************************************/
@@ -145,3 +232,4 @@ void apm32exx_flash_preinit(void)
 {
     flash_register(&apm32e10xflash_device, 1);
 }
+
