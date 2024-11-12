@@ -1,7 +1,7 @@
 #ifndef FLASH_TYPE_H
 #define FLASH_TYPE_H
 
-#include "platform_types.h"
+#include "Platform_Types.h"
 
 typedef struct flash_device
 {

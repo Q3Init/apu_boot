@@ -52,7 +52,7 @@ void rte_init(void)
     uart_init();
 #endif
 #ifdef CONFIG_FLASH
-    flash_init(0);
+    flash_init(INTERNAL_PFLASH_DRIVER_INDEX);
 #endif
 
     UartIf_Init();

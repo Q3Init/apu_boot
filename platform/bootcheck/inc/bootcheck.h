@@ -34,6 +34,9 @@
 **                      Global Function Declarations                          **
 *******************************************************************************/
 extern void BootSelectInit(void);
+extern std_return_t read_integrity_app_flag(uint32 *flag);
+extern std_return_t earse_integrity_app_flag(void);
+extern std_return_t write_integrity_app_flag(uint32 *flag);
 /*******************************************************************************
 **                      Global Inline Function Definitions                    **
 *******************************************************************************/

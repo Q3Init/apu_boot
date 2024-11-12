@@ -1,7 +1,7 @@
 #ifndef CLOCK_TYPE_H
 #define CLOCK_TYPE_H
 
-#include "platform_types.h"
+#include "Platform_Types.h"
 
 /**
  * @brief structure for clock Interface

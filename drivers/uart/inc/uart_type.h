@@ -1,7 +1,7 @@
 #ifndef UART_TYPE_H
 #define UART_TYPE_H
 
-#include "platform_types.h"
+#include "Platform_Types.h"
 
 /**
  * @brief structure for uart Interface

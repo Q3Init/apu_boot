@@ -1,7 +1,7 @@
 #ifndef CLOCK_H__
 #define CLOCK_H__
 
-#include "platform_types.h"
+#include "Platform_Types.h"
 
 /******************************************************************************/
 /*---------------------------- Macro definition ------------------------------*/

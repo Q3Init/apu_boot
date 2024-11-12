@@ -9,29 +9,10 @@
 /******************************************************************************/
 /*---------------------------    Macro        --------------------------------*/
 /******************************************************************************/
-#define APM32_FLASH_PAGE_SIZE 0x800
-#define APM32_FLASH_SECTOR_SIZE 0x800
-#define APM32_FLASH_BASE_ADDR FMC_BASE
-#define APM32_FLASH_SIZE 0x80000
 
 /******************************************************************************/
 /*----------------------------Callback Function ------------------------------*/
 /******************************************************************************/
-/* Declaration of Fls notification function (Test_FeeJobEndNotification())*/
-void Test_FeeJobEndNotification(void)
-{
-#if CONFIG_FEE
-    Fee_JobEndNotification();
-#endif
-}
-
-/* Declaration of Fls notification function (Test_FeeJobErrorNotification())*/
-void Test_FeeJobErrorNotification(void)
-{
-#if CONFIG_FEE
-    Fee_JobErrorNotification();
-#endif
-}
 
 /******************************************************************************/
 /*----------------------------Local Function ---------------------------------*/
@@ -41,14 +22,13 @@ void Test_FeeJobErrorNotification(void)
  */
 static void apm32e10xflash_init(void)
 {
+    /* Unlock the flash memory */
+    FMC_Unlock();
+
+    /* Clear all FMC flags */
+    FMC_ClearStatusFlag(FMC_FLAG_OC | FMC_FLAG_PE | FMC_FLAG_WPE);
 }
 
-// static std_return_t apm32e10xflash_get_offset_addr(uint32_t start_addr, uint32_t size, uint32_t *p_offset_addr)
-//{
-//     std_return_t ret_val = E_NOK;
-
-//    return ret_val;
-//}
 /**
  * @brief erase logical sector starting at the sector address
  *        Upon executing this command, the BUSY fag of the corresponding bank is set
@@ -67,7 +47,7 @@ static std_return_t apm32e10xflash_erase(uint32_t start_addr, uint32_t size)
         return E_NOK;
     }
 
-    if (((start_addr - APM32_FLASH_BASE_ADDR) % APM32_FLASH_PAGE_SIZE != 0) || (size % APM32_FLASH_PAGE_SIZE != 0))
+    if (((start_addr - APM32_FLASH_BASE_ADDR) % CONFIG_APM32E1XX_PFLASH_PAGE_SIZE != 0) || (size % CONFIG_APM32E1XX_PFLASH_PAGE_SIZE != 0))
     {
         return E_NOK;
     }
@@ -77,8 +57,8 @@ static std_return_t apm32e10xflash_erase(uint32_t start_addr, uint32_t size)
     while (1)
     {
         offset_addr = start_addr - APM32_FLASH_BASE_ADDR;
-        index = offset_addr / APM32_FLASH_PAGE_SIZE;
-        erase_addr = index * APM32_FLASH_PAGE_SIZE + APM32_FLASH_BASE_ADDR;
+        index = offset_addr / CONFIG_APM32E1XX_PFLASH_PAGE_SIZE;
+        erase_addr = index * CONFIG_APM32E1XX_PFLASH_PAGE_SIZE + APM32_FLASH_BASE_ADDR;
 
         if (FMC_STATUS_COMPLETE == FMC_ErasePage(erase_addr))
         {
@@ -90,13 +70,11 @@ static std_return_t apm32e10xflash_erase(uint32_t start_addr, uint32_t size)
             break;
         }
         // 清除所有标志位
-        FMC_ClearStatusFlag(FMC_FLAG_OC);
-        FMC_ClearStatusFlag(FMC_FLAG_PE);
-        FMC_ClearStatusFlag(FMC_FLAG_WPE);
-        start_addr = erase_addr + APM32_FLASH_PAGE_SIZE;
-        if (size > APM32_FLASH_PAGE_SIZE)
+        FMC_ClearStatusFlag(FMC_FLAG_OC | FMC_FLAG_PE | FMC_FLAG_WPE);
+        start_addr = erase_addr + CONFIG_APM32E1XX_PFLASH_PAGE_SIZE;
+        if (size > CONFIG_APM32E1XX_PFLASH_PAGE_SIZE)
         {
-            size -= APM32_FLASH_PAGE_SIZE;
+            size -= CONFIG_APM32E1XX_PFLASH_PAGE_SIZE;
         }
         else
         {
@@ -143,9 +121,7 @@ static std_return_t apm32e10xflash_write(uint32_t start_addr, uint32_t size, uin
         }
     }
     // 清除所有标志位
-    FMC_ClearStatusFlag(FMC_FLAG_OC);
-    FMC_ClearStatusFlag(FMC_FLAG_PE);
-    FMC_ClearStatusFlag(FMC_FLAG_WPE);
+    FMC_ClearStatusFlag(FMC_FLAG_OC | FMC_FLAG_PE | FMC_FLAG_WPE);
     // 退出FLASH编程
     FMC_Lock();
     return ret_val;
@@ -189,7 +165,10 @@ static bool apm32e10xflash_read(uint32_t address, uint32_t length, uint32_t *p_b
 uint32_t apm32e10xflash_get_sector_size(uint8_t flash_type)
 {
     uint32_t result = 0xFFFFFFFFu;
-
+    if (PFLASH_TYPE == flash_type)
+    {
+        result = CONFIG_APM32E1XX_PFLASH_SECTOR_SIZE;
+    }
     return result;
 }
 
@@ -204,7 +183,10 @@ uint32_t apm32e10xflash_get_sector_size(uint8_t flash_type)
 uint32_t apm32e10xflash_get_page_size(uint8_t flash_type)
 {
     uint32_t result = 0xFFFFFFFFu;
-
+    if (PFLASH_TYPE == flash_type)
+    {
+        result = CONFIG_APM32E1XX_PFLASH_PAGE_SIZE;
+    }
     return result;
 }
 
@@ -219,7 +201,7 @@ static const flash_device_t apm32e10xflash_device =
         .erase = apm32e10xflash_erase,
         .get_sector_size = apm32e10xflash_get_sector_size,
         .get_page_size = apm32e10xflash_get_page_size,
-        .flash_driver_index = 0,
+        .flash_driver_index = INTERNAL_PFLASH_DRIVER_INDEX,
 };
 
 /******************************************************************************/

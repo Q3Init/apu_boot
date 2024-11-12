@@ -1,8 +1,12 @@
 #ifndef FLASH_H
 #define FLASH_H
 
-#include "platform_types.h"
+#include "Platform_Types.h"
 #include "flash_type.h"
+
+#define PFLASH_TYPE (1u)
+#define DFLASH_TYPE (2u)
+#define INTERNAL_PFLASH_DRIVER_INDEX 0
 
 /**
  * @brief initialize Flash device

@@ -2,6 +2,7 @@
 **                      Includes                                              **
 *******************************************************************************/
 #include "bootcheck.h"
+#include "flash.h"
 /*******************************************************************************
 **                      Imported Compiler Switch Check                        **
 *******************************************************************************/
@@ -58,6 +59,54 @@ void BootSelectInit(void)
    }
 }
 
+/**
+* read_integrity_app_flag
+*
+ * @param flag: integrity app flag
+ * @return E_OK      - success
+ * @return E_NOK     - fail
+*
+* @brief  read integrity app flag
+*/
+std_return_t read_integrity_app_flag(uint32 *flag)
+{
+    std_return_t ret = E_NOK;
+    ret = flash_read(INTERNAL_PFLASH_DRIVER_INDEX,INTEGRITY_APP_FLAG_ADDRESS,sizeof(uint32),flag);
+    return ret;
+}
+
+/**
+* earse_integrity_app_flag
+*
+ * @return E_OK      - success
+ * @return E_NOK     - fail
+*
+* @brief  ease integrity app flag
+*/
+std_return_t earse_integrity_app_flag(void)
+{
+    std_return_t ret = E_NOK;
+    uint32 sector_size = flash_get_sector_size(INTERNAL_PFLASH_DRIVER_INDEX,PFLASH_TYPE);
+    ret = flash_erase(INTERNAL_PFLASH_DRIVER_INDEX,INTEGRITY_APP_FLAG_ADDRESS,sector_size);
+    return ret;
+}
+
+/**
+* write_integrity_app_flag
+*
+ * @param flag: integrity app flag
+ * @return E_OK      - success
+ * @return E_NOK     - fail
+*
+* @brief  read integrity app flag
+*/
+std_return_t write_integrity_app_flag(uint32 *flag)
+{
+    std_return_t ret = E_NOK;
+    ret = flash_write(INTERNAL_PFLASH_DRIVER_INDEX,INTEGRITY_APP_FLAG_ADDRESS,sizeof(uint32),flag);
+    return ret;
+}
+
 /*******************************************************************************
 **                      Private Function Definitions                          **
 *******************************************************************************/
@@ -70,8 +119,12 @@ void BootSelectInit(void)
 */
 static void BootScanAppEntry(void)
 {
-    if (0) { /* todo: Integrity app flag */
-        JumpToApp_Function();
+    uint32 integrity_app_flag = 0;
+    std_return_t ret = read_integrity_app_flag(&integrity_app_flag);
+    if (ret == E_OK) {
+        if (integrity_app_flag == INTEGRITY_APP_FLAG_OK) {
+            JumpToApp_Function();
+        }
     }
 }
 

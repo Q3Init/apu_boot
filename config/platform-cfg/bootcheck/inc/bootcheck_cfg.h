@@ -25,6 +25,10 @@ typedef enum
 /* Uart req */
 #define APP_JUMP_TO_BOOT_REQ1           (0x00011002UL)
 
+/* Integrity app flag address */
+#define INTEGRITY_APP_FLAG_ADDRESS      (0x08010800)
+#define INTEGRITY_APP_FLAG_OK           (0xAA)
+
 /* system irq control */
 #define __DISENBLE_IRQ() __disable_irq()
 #define __ENABLE_IRQ() __enable_irq()

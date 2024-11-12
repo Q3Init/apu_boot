@@ -1,7 +1,7 @@
 #ifndef UART_H
 #define UART_H
 
-#include "platform_types.h"
+#include "Platform_Types.h"
 
 /******************************************************************************/
 /*---------------------------- Macro definition ------------------------------*/

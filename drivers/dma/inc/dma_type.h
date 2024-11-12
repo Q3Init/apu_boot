@@ -1,7 +1,7 @@
 #ifndef DMA_TYPE_H
 #define DMA_TYPE_H
 
-#include "platform_types.h"
+#include "Platform_Types.h"
 
 /**
  * @brief structure for dma Interface
