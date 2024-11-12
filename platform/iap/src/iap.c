@@ -253,6 +253,7 @@ void Iap_RxIndication(uint8 rslt)
 void Iap_TxConfirmation(void)
 {
     iapRte.txBufState = Iap_BUFFER_IDLE;
+    iapRte.rxBufState = Iap_BUFFER_IDLE;
     if (iapRte.txCfirmReset == TRUE) {
         iapRte.txCfirmReset = FALSE;
         /* delay 50ms and perform reset */
@@ -354,8 +355,7 @@ static void Iap_StopCommunication_Service(void)
 static void Iap_Erase(void)
 {
     std_return_t ret = E_NOK;
-    uint32 app_start_addr = 0;
-    memcpy(&app_start_addr,&iapRte.rxPdu->datas[1],sizeof(uint32));
+    uint32 app_start_addr = (uint32)iapRte.rxPdu->datas[1] + (uint32)(iapRte.rxPdu->datas[2] << 8) + (uint32)(iapRte.rxPdu->datas[3] << 16) + (uint32)(iapRte.rxPdu->datas[4] << 24);
     if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
         return;
@@ -457,15 +457,15 @@ static void Iap_SoftReset(void)
 static void Iap_KeepSession(void)
 {
     iapRte.sessionTick = IAP_SET_TIMER(SESSION_TIMER_CNT);
-    iapRte.rxBufState = Iap_BUFFER_IDLE;
-    memset(iapRxBuf,0,sizeof(iapRxBuf));
+    Iap_lAppendTx(IAP_ACK);
+    Iap_PositiveResponse();
 }
 
 static void Iap_PositiveResponse(void)
 {
     if (iapRte.txBufState == Iap_BUFFER_IDLE) {
-        iapRte.rxBufState = Iap_BUFFER_IDLE;
         iapRte.txBufState = Iap_BUFFER_FULL;
+        iapRte.rxBufState = Iap_BUFFER_IDLE;
         iapRte.txPdu->len = TXLEN;
         iapRte.txPdu->datas[0] = iapRte.rxPdu->datas[0] + 0x40;
         PduR_Transmit(PDUR_RX_PUDID_ON_OTA_RSP,iapRte.txPdu);
@@ -476,8 +476,8 @@ static void Iap_PositiveResponse(void)
 static void Iap_NegativeResponse(uint8 ack)
 {
     if (iapRte.txBufState == Iap_BUFFER_IDLE) {
-        iapRte.rxBufState = Iap_BUFFER_IDLE;
         iapRte.txBufState = Iap_BUFFER_FULL;
+        iapRte.rxBufState = Iap_BUFFER_IDLE;
         iapRte.txPdu->len = 0x03;
         iapRte.txPdu->datas[0] = 0x7F;
         iapRte.txPdu->datas[1] = iapRte.rxPdu->datas[0];
