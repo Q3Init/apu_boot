@@ -326,6 +326,7 @@ static void Iap_ProgrammingSession_Service(void)
 {
     if (iapRte.sessionLv != Extern_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+        return;
     }
     iapRte.sessionLv = Programming_session;
     iapRte.sessionTick = IAP_SET_TIMER(SESSION_TIMER_CNT);
@@ -344,6 +345,7 @@ static void Iap_StopCommunication_Service(void)
 {
     if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+        return;
     }
     Iap_lAppendTx(IAP_ACK);
     Iap_PositiveResponse();
@@ -356,18 +358,22 @@ static void Iap_Erase(void)
     memcpy(&app_start_addr,&iapRte.rxPdu->datas[1],sizeof(uint32));
     if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+        return;
     }
     ret = earse_integrity_app_flag();
     if (ret != E_OK) {
         Iap_NegativeResponse(IAP_ERASE_ERROR);
+        return;
     }
     if (app_start_addr == APP_BANKA_START_ADDRESS) {
         ret = flash_erase(INTERNAL_PFLASH_DRIVER_INDEX,APP_BANKA_START_ADDRESS,APP_BANK_SIZE);
         if (ret != E_OK) {
-        Iap_NegativeResponse(IAP_ERASE_ERROR);
+            Iap_NegativeResponse(IAP_ERASE_ERROR);
+            return;
         }
     } else {
         Iap_NegativeResponse(IAP_ERASE_ADDRESS_ERROR);
+        return;
     }
     Iap_lAppendTx(IAP_ACK);
     Iap_PositiveResponse();
@@ -377,6 +383,7 @@ static void Iap_Downloadn(void)
 {
     if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+        return;
     }
     iapRte.app_block = 0;
     iapRte.app_address = INTEGRITY_APP_FLAG_ADDRESS;
@@ -392,6 +399,7 @@ static void Iap_Transing(void)
     uint16 download_appblock = (uint16)iapRte.rxPdu->datas[1] + (uint16)(iapRte.rxPdu->datas[1] << 8);
     if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+        return;
     }
     if ((iapRte.app_block + 1) == download_appblock) {
         for (uint16 index = 0;index <= ((iapRte.rxPdu->len - 3) / 4);index++) {
@@ -399,6 +407,7 @@ static void Iap_Transing(void)
             ret = flash_write(INTERNAL_PFLASH_DRIVER_INDEX,write_address,(iapRte.rxPdu->len - 3),&write_data);
             if (ret != E_OK) {
                 Iap_NegativeResponse(IAP_WRITE_EEROR);
+                return;
             } else {
                 write_address+=4;
                 index+=4;
@@ -408,6 +417,7 @@ static void Iap_Transing(void)
         iapRte.app_block++;
     } else {
         Iap_NegativeResponse(IAP_SEQUENCE_OF_APP_BLOCK_ERROR);
+        return;
     }
     Iap_lAppendTx(IAP_ACK);
     Iap_PositiveResponse();
@@ -417,6 +427,7 @@ static void Iap_TransExit(void)
 {
     if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+        return;
     }
     Iap_lAppendTx(IAP_ACK);
     Iap_PositiveResponse();
@@ -426,6 +437,7 @@ static void Iap_CheckApp(void)
 {
     if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+        return;
     }
     Iap_lAppendTx(IAP_ACK);
     Iap_PositiveResponse();
@@ -435,6 +447,7 @@ static void Iap_SoftReset(void)
 {
     if (iapRte.sessionLv == Defalut_session) {
         Iap_NegativeResponse(IAP_SESSION_MISMATCH);
+        return;
     }
     iapRte.txCfirmReset = TRUE;
     Iap_lAppendTx(IAP_ACK);
